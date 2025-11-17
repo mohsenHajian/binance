@@ -1,13 +1,12 @@
 <template>
-  <div class="flex gap-4 p-4">
+  <div class="flex gap-0.5">
     <div class="left-column" ref="leftColumn">
       <div
         v-for="(box, index) in leftBoxes"
         :key="box.id"
         class="box"
         :style="{
-          background: box.color,
-          height: box.h + 'px',
+          height: box.h,
           width: box.width,
         }"
       >
@@ -22,8 +21,7 @@
         :key="box.id"
         class="box"
         :style="{
-          background: box.color,
-          height: box.h + 'px',
+          height: '48vh',
           width: box.width,
         }"
       >
@@ -37,17 +35,19 @@
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import Sortable from "sortablejs";
 
+const smallBoxWidth = 320
+
 const allBoxes = ref([
-  { id: 1, color: "#FF6B6B", label: "Box 1", h: 180, width: "320px" },
-  { id: 2, color: "#4ECDC4", label: "Box 2", h: 260, width: "320px" },
-  { id: 3, color: "#FFD93D", label: "Box 3", h: 140, width: "320px" },
-  { id: 4, color: "#1A535C", label: "Box 4", h: 220, width: "100%" },
-  { id: 5, color: "#FF9F1C", label: "Box 5", h: 170, width: "100%" },
-  { id: 6, color: "#6A4C93", label: "Box 6", h: 120, width: "100%" },
-  { id: 7, color: "#30AADD", label: "Box 7", h: 300, width: "100%" },
-  { id: 8, color: "#E63946", label: "Box 8", h: 150, width: "100%" },
-  { id: 9, color: "#0081A7", label: "Box 9", h: 240, width: "100%" },
-  { id: 10, color: "#B5179E", label: "Box 10", h: 200, width: "100%" },
+  { id: 1, label: "Box 1", h: "220px", width: "320px" },
+  { id: 2, label: "Box 2", h: "220px", width: "320px" },
+  { id: 3, label: "Box 3", h: "220px", width: "320px" },
+  { id: 4, label: "Box 4", h: "50vh", width: "50%" },
+  { id: 5, label: "Box 5", h: "220px", width: "320px" },
+  { id: 6, label: "Box 6", h: "220px", width: "100%" },
+  { id: 7, label: "Box 7", h: "220px", width: "100%" },
+  { id: 8, label: "Box 8", h: "220px", width: "100%" },
+  { id: 9, label: "Box 9", h: "220px", width: "100%" },
+  { id: 10, label: "Box 10", h: "220px", width: "100%" },
 ]);
 
 const rightBoxes = ref(allBoxes.value.slice(0, 3));
@@ -57,13 +57,15 @@ const leftColumn = ref(null);
 const rightColumn = ref(null);
 
 const updateLeftBoxesWidth = () => {
-  const rightWidth = 370;
-  const gap = 12;
-  const leftWidth = window.innerWidth - rightWidth - gap + "px";
+  const rightWidth = smallBoxWidth;
+  const gap = 21;
+  const leftWidth = window.innerWidth - rightWidth - gap;
 
   leftBoxes.value.forEach((box) => {
-    if (parseInt(box.width) > 320 || box.width === "100%") {
-      box.width = leftWidth;
+    if (box.width === "100%") {
+      box.width = leftWidth + "px";
+    } else if (box.width === "50%") {
+      box.width = leftWidth - smallBoxWidth - 6 + "px";
     }
   });
 };
@@ -109,21 +111,14 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.container {
-  display: flex;
-  gap: 12px;
-  padding: 12px;
-  width: 100vw;
-  height: 100vh;
-  box-sizing: border-box;
-  overflow-y: auto;
-}
-
 .left-column,
 .right-column {
   display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.right-column {
   flex-direction: column;
-  gap: 12px;
 }
 
 .box {
@@ -135,6 +130,7 @@ onBeforeUnmount(() => {
   align-items: center;
   cursor: grab;
   user-select: none;
+  background-color: #181a20;
 }
 
 .drag-ghost {
