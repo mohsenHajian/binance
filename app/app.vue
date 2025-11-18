@@ -22,6 +22,7 @@
       </div>
 
       <div class="right-column" ref="rightColumn">
+        <TradingBox :style="{ width: smWidth + 'px' }" />
         <div
           v-for="(box, index) in rightBoxes"
           :key="box.id"
@@ -43,6 +44,7 @@ import Sortable from "sortablejs";
 import TheHeader from "./components/base/TheHeader.vue";
 import BinanceTrack from "./components/Main/BinanceTrack.vue";
 import LandingDetails from "./components/Main/LandingDetails.vue";
+import TradingBox from "./components/Sidebar/TradingBox.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -54,7 +56,6 @@ const updateSymbol = (newSymbol) => {
   router.replace({ query: { ...route.query, symbol: newSymbol } });
 };
 
-// باقی کد layout و Sortable مثل قبل
 const smallBoxWidth = 320;
 const allBoxes = ref([
   { id: 1, label: "Box 1", h: "220px", width: "320px" },

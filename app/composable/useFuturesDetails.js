@@ -1,7 +1,8 @@
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, watch, onMounted, onUnmounted } from "vue";
+import axios from "axios";
 
-export function useFuturesDetails(symbol = "BTCUSDT") {
-  const _symbol = ref(symbol.toUpperCase());
+export function useFuturesDetails(symbolRef) {
+  const _symbol = ref(symbolRef.value.toUpperCase());
 
   const perpPrice = ref(0);
   const change = ref(0);
@@ -24,12 +25,10 @@ export function useFuturesDetails(symbol = "BTCUSDT") {
   const formatCountdown = () => {
     const ms = nextFundingTime - Date.now();
     if (ms <= 0) return "00:00:00";
-
     const totalSeconds = Math.floor(ms / 1000);
     const h = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
     const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
     const s = String(totalSeconds % 60).padStart(2, "0");
-
     return `${h}:${m}:${s}`;
   };
 
@@ -40,7 +39,43 @@ export function useFuturesDetails(symbol = "BTCUSDT") {
     }, 1000);
   };
 
+  // -------- Snapshot API call --------
+  const fetchSnapshot = async () => {
+    try {
+      const symbol = _symbol.value;
+      const respTicker = await axios.get(
+        `https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=${symbol}`
+      );
+      const data = respTicker.data;
+
+      perpPrice.value = parseFloat(data.lastPrice);
+      change.value = parseFloat(data.priceChange);
+      changePercent.value = parseFloat(data.priceChangePercent);
+      high24h.value = parseFloat(data.highPrice);
+      low24h.value = parseFloat(data.lowPrice);
+      volumeBTC.value = parseFloat(data.volume);
+      volumeUSDT.value = parseFloat(data.quoteVolume);
+      openInterestUSDT.value = parseFloat(data.openInterest ?? 0);
+
+      // MARK PRICE و FUNDING RATE snapshot
+      const respMark = await axios.get(
+        `https://fapi.binance.com/fapi/v1/premiumIndex?symbol=${symbol}`
+      );
+      const markData = respMark.data;
+      markPrice.value = parseFloat(markData.markPrice);
+      indexPrice.value = parseFloat(markData.indexPrice);
+      fundingRate.value = parseFloat(markData.lastFundingRate) * 100;
+      nextFundingTime = markData.nextFundingTime;
+      startCountdown();
+    } catch (err) {
+      console.error("Failed to fetch snapshot:", err);
+    }
+  };
+
+  // -------- WebSocket --------
   const startSocket = () => {
+    if (ws) ws.close();
+
     const stream = `${_symbol.value.toLowerCase()}@ticker/${_symbol.value.toLowerCase()}@markPrice`;
     ws = new WebSocket(`wss://fstream.binance.com/stream?streams=${stream}`);
 
@@ -61,26 +96,37 @@ export function useFuturesDetails(symbol = "BTCUSDT") {
       if (stream.endsWith("@markPrice")) {
         markPrice.value = parseFloat(data.p);
         indexPrice.value = parseFloat(data.i);
-        fundingRate.value = parseFloat(data.r) * 100; // ← درصد واقعی + صحیح
-
+        fundingRate.value = parseFloat(data.r) * 100;
         nextFundingTime = data.T;
         startCountdown();
       }
     };
   };
 
-  const setSymbol = (newSymbol) => {
+  const refreshSymbol = async (newSymbol) => {
     _symbol.value = newSymbol.toUpperCase();
-    if (ws) ws.close();
+    await fetchSnapshot(); 
     startSocket();
   };
 
-  onMounted(startSocket);
+  watch(symbolRef, async (newSymbol) => {
+    if (newSymbol) {
+      await refreshSymbol(newSymbol);
+    }
+  });
+
+  onMounted(async () => {
+    await refreshSymbol(_symbol.value);
+  });
 
   onUnmounted(() => {
     if (ws) ws.close();
     clearInterval(countdownTimer);
   });
+
+  const setSymbol = (newSymbol) => {
+    symbolRef.value = newSymbol;
+  };
 
   return {
     symbol: _symbol,

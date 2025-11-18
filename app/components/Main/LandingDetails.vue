@@ -5,7 +5,7 @@
     <div class="flex items-center gap-2 mb-2 cursor-default">
       <img :src="iconUrl" class="w-6 h-6" />
       <h2 class="font-semibold text-[20px]">
-        {{ route?.query?.symbol || "BNBUSDT" }}
+        {{ symbol || "BNBUSDT" }}
       </h2>
       <span
         class="py-0.5 px-0.5 bg-[#29313D] rounded-[2px] text-[10px] relative -top-0.5"
@@ -25,7 +25,7 @@
 
     <div class="flex flex-col items-center mx-4 relative -top-1 cursor-default">
       <span
-        class="text-xl leading-normal transition-all"
+        class="text-xl leading-normal transition-colors font-mono inline-block min-w-[100px] text-left"
         :class="[
           priceTrend === 'up'
             ? 'text-[#2EBD85]'
@@ -37,78 +37,57 @@
         {{ perpPrice?.toLocaleString() ?? "..." }}
       </span>
 
-      <div class="flex items-center gap-2">
-        <span :class="change >= 0 ? 'text-[#2EBD85]' : 'text-[#F6465D]'">
+      <div class="flex items-center gap-2 font-mono">
+        <span
+          class="inline-block min-w-[60px] text-left"
+          :class="change >= 0 ? 'text-[#2EBD85]' : 'text-[#F6465D]'"
+        >
           {{ change?.toLocaleString() ?? "..." }}
         </span>
-        <span :class="changePercent >= 0 ? 'text-[#2EBD85]' : 'text-[#F6465D]'">
+        <span
+          class="inline-block min-w-[65px] text-left"
+          :class="changePercent >= 0 ? 'text-[#2EBD85]' : 'text-[#F6465D]'"
+        >
           ({{ changePercent?.toFixed(2) ?? "..." }}%)
         </span>
       </div>
     </div>
 
     <div class="flex flex-wrap gap-2 text-[12px] cursor-default">
-      <div class="flex flex-col font-normal gap-2">
-        <span class="text-[#707A8A] hover:text-white transition-all text-xs"
-          >Mark</span
-        >
-        <span>{{ markPrice?.toLocaleString() ?? "..." }}</span>
-      </div>
-      <div class="flex flex-col font-normal gap-2">
-        <span class="text-[#707A8A] hover:text-white transition-all text-xs"
-          >Index</span
-        >
-        <span>{{ indexPrice?.toLocaleString() ?? "..." }}</span>
-      </div>
-      <div class="flex flex-col mb-2 font-normal gap-2">
-        <span class="text-[#707A8A] hover:text-white transition-all text-xs"
-          >Funding (8h) / Countdown</span
-        >
-        <span>
-          {{ fundingRate?.toFixed(5) ?? "..." }}% /
-          {{ fundingCountdownFormatted ?? "..." }}
-        </span>
-      </div>
-      <div class="flex flex-col font-normal gap-2">
-        <span class="text-[#707A8A] hover:text-white transition-all text-xs"
-          >24h High</span
-        >
-        <span>{{ high24h?.toLocaleString() ?? "..." }}</span>
-      </div>
-      <div class="flex flex-col font-normal gap-2">
-        <span class="text-[#707A8A] hover:text-white transition-all text-xs"
-          >24h Low</span
-        >
-        <span>{{ low24h?.toLocaleString() ?? "..." }}</span>
-      </div>
-      <div class="flex flex-col font-normal gap-2">
-        <span class="text-[#707A8A] hover:text-white transition-all text-xs"
-          >Volume (BTC)</span
-        >
-        <span>{{ volumeBTC?.toLocaleString() ?? "..." }}</span>
-      </div>
-      <div class="flex flex-col font-normal gap-2">
-        <span class="text-[#707A8A] hover:text-white transition-all text-xs"
-          >Volume (USDT)</span
-        >
-        <span>{{ volumeUSDT?.toLocaleString() ?? "..." }}</span>
-      </div>
-      <div class="flex flex-col font-normal gap-2">
-        <span class="text-[#707A8A] hover:text-white transition-all text-xs"
-          >Open Interest (USDT)</span
-        >
-        <span>{{ openInterestUSDT?.toLocaleString() ?? "..." }}</span>
-      </div>
+      <InfoItem label="Mark" :value="markPrice.toFixed(2)" />
+      <InfoItem label="Index" :value="indexPrice.toFixed(2)" />
+      <InfoItem label="Funding (8h) / Countdown" :value="fundingRateDisplay" />
+      <InfoItem label="24h High" :value="high24h" />
+      <InfoItem label="24h Low" :value="low24h" />
+      <InfoItem label="Volume (BTC)" :value="volumeBTC.toFixed(2)" />
+      <InfoItem label="Volume (USDT)" :value="volumeUSDT.toFixed(2)" />
+      <InfoItem label="Open Interest (USDT)" :value="openInterestUSDT" />
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed, ref, watch } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute } from "#imports";
 import { useFuturesDetails } from "../../composable/useFuturesDetails";
+import InfoItem from "../utils/InfoItem.vue";
 
 const route = useRoute();
+const querySymbol = ref("BTCUSDT");
+
+onMounted(() => {
+  if (route && route.query && route.query.symbol) {
+    querySymbol.value = route.query.symbol;
+  }
+});
+
+watch(
+  () => route.query?.symbol,
+  (newVal) => {
+    if (newVal) querySymbol.value = newVal;
+  }
+);
+
 const {
   symbol,
   perpPrice,
@@ -123,19 +102,24 @@ const {
   volumeBTC,
   volumeUSDT,
   openInterestUSDT,
-} = useFuturesDetails(route?.query?.symbol || "BTCUSDT");
+} = useFuturesDetails(querySymbol);
 
 const prevPrice = ref(null);
 const priceTrend = ref("neutral");
 
 watch(perpPrice, (val) => {
   if (prevPrice.value !== null) {
-    if (val > prevPrice.value) priceTrend.value = "up";
-    else if (val < prevPrice.value) priceTrend.value = "down";
-    else priceTrend.value = "neutral";
+    priceTrend.value =
+      val > prevPrice.value ? "up" : val < prevPrice.value ? "down" : "neutral";
   }
   prevPrice.value = val;
 });
+
+const fundingRateDisplay = computed(() =>
+  fundingRate.value != null && fundingCountdownFormatted.value != null
+    ? `${fundingRate.value.toFixed(5)}% / ${fundingCountdownFormatted.value}`
+    : "..."
+);
 
 const iconUrl = computed(() => {
   const map = { btc: 1, eth: 1027, bnb: 1839 };
@@ -148,5 +132,10 @@ const iconUrl = computed(() => {
 <style scoped>
 .box {
   font-size: 12px;
+}
+
+/* اعداد بدون پرش */
+* {
+  font-feature-settings: "tnum";
 }
 </style>
