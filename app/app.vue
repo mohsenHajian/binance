@@ -1,31 +1,35 @@
 <template>
-  <div class="flex gap-0.5">
-    <div class="left-column" ref="leftColumn">
-      <div
-        v-for="(box, index) in leftBoxes"
-        :key="box.id"
-        class="box"
-        :style="{
-          height: box.h,
-          width: box.width,
-        }"
-      >
-        {{ box.label }}
-      </div>
-    </div>
+  <div class="flex flex-col w-full">
+    <TheHeader />
 
-    <!-- ستون راست: باکس‌های کوچک -->
-    <div class="right-column" ref="rightColumn">
-      <div
-        v-for="(box, index) in rightBoxes"
-        :key="box.id"
-        class="box"
-        :style="{
-          height: '48vh',
-          width: box.width,
-        }"
-      >
-        {{ box.label }}
+    <div class="flex gap-0.5">
+      <div class="left-column" ref="leftColumn">
+        <BinanceTrack
+          :symbol="symbol"
+          @update:symbol="updateSymbol"
+          :style="{ width: xlWidth + 'px' }"
+        />
+        <LandingDetails :style="{ width: xlWidth + 'px' }" />
+
+        <div
+          v-for="(box, index) in leftBoxes"
+          :key="box.id"
+          class="box flex items-center justify-center"
+          :style="{ height: box.h, width: box.width }"
+        >
+          {{ box.label }}
+        </div>
+      </div>
+
+      <div class="right-column" ref="rightColumn">
+        <div
+          v-for="(box, index) in rightBoxes"
+          :key="box.id"
+          class="box flex items-center justify-center"
+          :style="{ height: '48vh', width: box.width }"
+        >
+          {{ box.label }}
+        </div>
       </div>
     </div>
   </div>
@@ -33,18 +37,33 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
+import { useRouter, useRoute } from "#imports";
 import Sortable from "sortablejs";
 
-const smallBoxWidth = 320
+import TheHeader from "./components/base/TheHeader.vue";
+import BinanceTrack from "./components/Main/BinanceTrack.vue";
+import LandingDetails from "./components/Main/LandingDetails.vue";
 
+const route = useRoute();
+const router = useRouter();
+
+const symbol = ref(route.query.symbol || "BTCUSDT");
+
+const updateSymbol = (newSymbol) => {
+  symbol.value = newSymbol;
+  router.replace({ query: { ...route.query, symbol: newSymbol } });
+};
+
+// باقی کد layout و Sortable مثل قبل
+const smallBoxWidth = 320;
 const allBoxes = ref([
   { id: 1, label: "Box 1", h: "220px", width: "320px" },
   { id: 2, label: "Box 2", h: "220px", width: "320px" },
   { id: 3, label: "Box 3", h: "220px", width: "320px" },
-  { id: 4, label: "Box 4", h: "50vh", width: "50%" },
+  { id: 4, label: "Box 4", h: "50vh", width: "80%" },
   { id: 5, label: "Box 5", h: "220px", width: "320px" },
-  { id: 6, label: "Box 6", h: "220px", width: "100%" },
-  { id: 7, label: "Box 7", h: "220px", width: "100%" },
+  { id: 6, label: "Box 6", h: "50px", width: "100%" },
+  { id: 7, label: "Box 7", h: "50px", width: "100%" },
   { id: 8, label: "Box 8", h: "220px", width: "100%" },
   { id: 9, label: "Box 9", h: "220px", width: "100%" },
   { id: 10, label: "Box 10", h: "220px", width: "100%" },
@@ -56,16 +75,22 @@ const leftBoxes = ref(allBoxes.value.slice(3));
 const leftColumn = ref(null);
 const rightColumn = ref(null);
 
+const xlWidth = ref(0);
+const lgWidth = ref(0);
+const smWidth = ref(320);
+
 const updateLeftBoxesWidth = () => {
   const rightWidth = smallBoxWidth;
-  const gap = 21;
+  const gap = 17;
   const leftWidth = window.innerWidth - rightWidth - gap;
 
   leftBoxes.value.forEach((box) => {
     if (box.width === "100%") {
       box.width = leftWidth + "px";
-    } else if (box.width === "50%") {
+      xlWidth.value = leftWidth;
+    } else if (box.width === "80%") {
       box.width = leftWidth - smallBoxWidth - 6 + "px";
+      lgWidth.value = leftWidth - smallBoxWidth - 6;
     }
   });
 };
@@ -111,26 +136,22 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.left-column,
-.right-column {
+.left-column {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-}
-.right-column {
-  flex-direction: column;
+  row-gap: 6px;
+  align-content: flex-start;
 }
 
-.box {
-  border-radius: 10px;
-  color: white;
-  font-weight: bold;
+.left-column .box:last-child {
+  margin-bottom: 0;
+}
+
+.right-column {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: grab;
-  user-select: none;
-  background-color: #181a20;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .drag-ghost {
