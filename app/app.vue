@@ -10,14 +10,13 @@
           :style="{ width: xlWidth + 'px' }"
         />
         <LandingDetails :style="{ width: xlWidth + 'px' }" />
+        <TradingViewBox :style="{ width: lgWidth + 'px' }" />
 
         <div
-          v-for="(box, index) in leftBoxes"
-          :key="box.id"
-          class="box flex items-center justify-center"
-          :style="{ height: box.h, width: box.width }"
+          class="flex items-center justify-center box h-[220px]"
+          :style="{ width: smWidth + 'px' }"
         >
-          {{ box.label }}
+          hi
         </div>
       </div>
 
@@ -45,6 +44,7 @@ import TheHeader from "./components/base/TheHeader.vue";
 import BinanceTrack from "./components/Main/BinanceTrack.vue";
 import LandingDetails from "./components/Main/LandingDetails.vue";
 import TradingBox from "./components/Sidebar/TradingBox.vue";
+import TradingViewBox from "./components/Main/TradingViewBox.vue";
 
 const route = useRoute();
 const router = useRouter();
