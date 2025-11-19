@@ -13,7 +13,7 @@
         <TradingViewBox :style="{ width: lgWidth + 'px' }" />
 
         <div
-          class="flex items-center justify-center box h-[220px]"
+          class="flex items-center justify-center box h-[220px] drag-handle"
           :style="{ width: smWidth + 'px' }"
         >
           hi
@@ -105,6 +105,7 @@ onMounted(() => {
   Sortable.create(leftColumn.value, {
     group: groupOptions,
     animation: 150,
+    handle: ".drag-handle",
     ghostClass: "drag-ghost",
     onStart(evt) {
       evt.item.style.visibility = "hidden";
@@ -119,6 +120,7 @@ onMounted(() => {
   Sortable.create(rightColumn.value, {
     group: groupOptions,
     animation: 150,
+    handle: ".drag-handle",
     ghostClass: "drag-ghost",
     onStart(evt) {
       evt.item.style.visibility = "hidden";

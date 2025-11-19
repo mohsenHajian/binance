@@ -1,5 +1,5 @@
 <template>
-  <div class="relative">
+  <div class="relative drag-handle">
     <div class="absolute top-1 right-2 z-50 cursor-pointer">
       <button
         @click="toggleFullscreen"

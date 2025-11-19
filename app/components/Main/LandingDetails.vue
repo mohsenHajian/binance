@@ -31,7 +31,7 @@
             ? 'text-[#2EBD85]'
             : priceTrend === 'down'
             ? 'text-[#F6465D]'
-            : 'text-white',
+            : 'text-[#F6465D]',
         ]"
       >
         {{ perpPrice?.toLocaleString() ?? "..." }}

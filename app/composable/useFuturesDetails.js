@@ -1,9 +1,12 @@
 import { ref, watch, onMounted, onUnmounted } from "vue";
 import axios from "axios";
+import { useFuturesStore } from "../stores/futures";
 
 export function useFuturesDetails(symbolRef) {
+  const store = useFuturesStore();
   const _symbol = ref(symbolRef.value.toUpperCase());
 
+  // --- Reactive refs ---
   const perpPrice = ref(0);
   const change = ref(0);
   const changePercent = ref(0);
@@ -11,7 +14,6 @@ export function useFuturesDetails(symbolRef) {
   const indexPrice = ref(0);
   const fundingRate = ref(0);
   const fundingCountdownFormatted = ref("00:00:00");
-
   const high24h = ref(0);
   const low24h = ref(0);
   const volumeBTC = ref(0);
@@ -57,7 +59,6 @@ export function useFuturesDetails(symbolRef) {
       volumeUSDT.value = parseFloat(data.quoteVolume);
       openInterestUSDT.value = parseFloat(data.openInterest ?? 0);
 
-      // MARK PRICE و FUNDING RATE snapshot
       const respMark = await axios.get(
         `https://fapi.binance.com/fapi/v1/premiumIndex?symbol=${symbol}`
       );
@@ -67,6 +68,7 @@ export function useFuturesDetails(symbolRef) {
       fundingRate.value = parseFloat(markData.lastFundingRate) * 100;
       nextFundingTime = markData.nextFundingTime;
       startCountdown();
+      store.setPrice(perpPrice.value);
     } catch (err) {
       console.error("Failed to fetch snapshot:", err);
     }
@@ -75,12 +77,14 @@ export function useFuturesDetails(symbolRef) {
   // -------- WebSocket --------
   const startSocket = () => {
     if (ws) ws.close();
-
     const stream = `${_symbol.value.toLowerCase()}@ticker/${_symbol.value.toLowerCase()}@markPrice`;
     ws = new WebSocket(`wss://fstream.binance.com/stream?streams=${stream}`);
 
     ws.onmessage = (msg) => {
       const { stream, data } = JSON.parse(msg.data);
+
+      // فقط اگر پیام مربوط به Symbol فعلی باشه آپدیت کن
+      if (data.s !== _symbol.value) return;
 
       if (stream.endsWith("@ticker")) {
         perpPrice.value = parseFloat(data.c);
@@ -103,9 +107,14 @@ export function useFuturesDetails(symbolRef) {
     };
   };
 
+  // -------- Refresh Symbol --------
   const refreshSymbol = async (newSymbol) => {
     _symbol.value = newSymbol.toUpperCase();
-    await fetchSnapshot(); 
+
+    // Reset store for new symbol
+    store.setPrice(null);
+
+    await fetchSnapshot();
     startSocket();
   };
 

@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="visible"
-    class="box relative"
+    class="box relative drag-handle"
     @mouseenter="hover = true"
     @mouseleave="hover = false"
   >

@@ -48,3 +48,7 @@ body {
   background: transparent !important;
   outline: none !important;
 }
+
+.drag-handle {
+  cursor: grab !important;
+}
