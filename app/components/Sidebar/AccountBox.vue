@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col box drag-handle h-[45vh]">
+  <div class="flex flex-col box drag-handle min-h-[45vh]">
     <div
       class="flex items-center w-full px-4 text-[#EAECEF] h-10 border-b border-[#333B47] text-sm"
     >

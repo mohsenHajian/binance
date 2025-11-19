@@ -1,10 +1,12 @@
 <template>
-  <div class="flex flex-col font-normal gap-2">
-    <span class="text-[#707A8A] hover:text-white transition-all text-xs">
+  <div class="flex flex-col max-md:min-w-[46%] font-normal gap-0.5 md:gap-2">
+    <span
+      class="text-[#707A8A] hover:text-white transition-all text-[8px] md:text-xs whitespace-nowrap"
+    >
       {{ label }}
     </span>
     <span
-      class="font-mono inline-block min-w-[60px] text-left"
+      class="font-mono inline-block min-w-[60px] text-[10px] md:text-xs text-left whitespace-nowrap"
       :class="valueClass"
     >
       {{ formattedValue }}

@@ -1,8 +1,8 @@
 <template>
   <header
-    class="flex items-center justify-between h-[64px] w-full px-4 mb-1.5 bg-[#181a20] relative rounded-lg"
+    class="flex items-center justify-between h-[64px] w-full mb-1.5 bg-[#181a20] relative md:rounded-lg"
   >
-    <div class="flex items-center">
+    <div class="flex flex-nowrap items-center pl-2 md:pl-4">
       <svg
         class="w-6 h-fit text-white mx-2"
         xmlns="http://www.w3.org/2000/svg"
@@ -15,21 +15,35 @@
           d="M512 128L128 447.936V896h255.936V640H640v256h255.936V447.936z"
         />
       </svg>
-      <img src="/logo.png" alt="logo" class="mx-2 h-[64px]" />
-      <TheDropDown title="Futures" :items="futuresMenu" />
-      <TheDropDown title="Options" :items="optionsMenu" />
-      <TheDropDown title="Trading  Bots" :items="tradingBots" />
-      <TheDropDown title="Copy Trading" />
-      <TheDropDown title="Smart Money" />
-      <TheDropDown title="Data" :items="data" />
-      <TheDropDown title="More" :items="more" />
+      <img src="/logo.png" alt="logo" class="mx-1 md:mx-2 h-[64px]" />
+      <div class="hidden md:flex items-center max-w-[0px]">
+        <TheDropDown title="Futures" :items="futuresMenu" />
+        <TheDropDown title="Options" :items="optionsMenu" />
+        <TheDropDown title="Trading Bots" :items="tradingBots" />
+        <TheDropDown title="Copy Trading" />
+        <TheDropDown title="Smart Money" />
+        <TheDropDown title="Data" :items="data" />
+        <TheDropDown title="More" :items="more" />
+      </div>
     </div>
 
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-3 pl-2 bg-[#181a20] pr-2 md:pr-4 z-[3]">
+      <div class="flex items-center gap-2 mr-2">
+        <button
+          class="h-8 px-2.5 hidden md:flex items-center justify-center rounded-[4px] text-sm bg-[#333B47] text-[#EAECEF] font-semibold whitespace-nowrap"
+        >
+          login
+        </button>
+        <button
+          class="h-8 px-2.5 flex items-center justify-center rounded-[4px] text-sm bg-[#FCD535] text-[#202630] font-semibold whitespace-nowrap"
+        >
+          Sign Up
+        </button>
+      </div>
       <svg
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
-        class="text-white hover:text-[#F0B90B] cursor-pointer transition-all w-6"
+        class="hidden md:flex text-white hover:text-[#F0B90B] cursor-pointer transition-all w-6"
       >
         <path
           d="M12 2c2.364 0 4.301 4.051 4.484 9.2H21V13h-4.523c-.225 5.053-2.144 9-4.477 9s-4.252-3.947-4.478-9H3v-1.8h4.516C7.699 6.051 9.636 2 12 2zM9.324 13c.105 2.146.54 4.006 1.136 5.332.764 1.697 1.447 1.868 1.54 1.868.093 0 .776-.171 1.54-1.868.597-1.326 1.031-3.186 1.136-5.332H9.324zM12 3.8c-.093 0-.776.171-1.54 1.868C9.845 7.035 9.403 8.97 9.316 11.2h5.368c-.087-2.23-.529-4.165-1.144-5.532C12.776 3.971 12.093 3.8 12 3.8z"
@@ -67,7 +81,7 @@
       <svg
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
-        class="text-white w-6 hover:text-[#F0B90B] cursor-pointer transition-all"
+        class="text-white hidden md:flex w-6 hover:text-[#F0B90B] cursor-pointer transition-all"
       >
         <path
           d="M2 12c0-3.781 2.1-7.07 5.195-8.77.711-.39 1.461.32 1.37 1.126l-.028.282A10.11 10.11 0 008.5 5.5l.013.514a10 10 0 009.472 9.472l.515.013c.388 0 .77-.022 1.146-.065.805-.092 1.516.658 1.126 1.37l-.164.286A9.993 9.993 0 0112 22v-1.8a8.178 8.178 0 006.258-2.905C11.933 17.168 6.83 12.066 6.703 5.742a8.176 8.176 0 00-2.898 5.968L3.8 12a8.2 8.2 0 008.2 8.2V22l-.515-.014a10 10 0 01-9.472-9.472L2 12z"
@@ -235,4 +249,8 @@ const more = [
 ];
 </script>
 
-<style scoped></style>
+<style scoped>
+.nav-bar {
+  max-width: calc(100vw - 500px);
+}
+</style>

@@ -5,10 +5,10 @@
     @mouseleave="isOpen = false"
   >
     <button
-      class="flex items-center gap-2 h-[64px] rounded px-3 duration-200"
+      class="flex flex-nowrap items-center gap-2 h-[64px] rounded px-3 duration-200"
       :style="{ color: isOpen ? '#F0B90B' : '#ffffff' }"
     >
-      <span class="text-sm">{{ title }}</span>
+      <span class="text-sm whitespace-nowrap">{{ title }}</span>
 
       <svg
         v-if="items"

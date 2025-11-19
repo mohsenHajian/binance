@@ -29,6 +29,14 @@ body {
   background: #6a6a6a;
 }
 
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 .box {
   border-radius: 6px;
   color: white;
@@ -42,6 +50,12 @@ body {
   margin: 0 !important;
 }
 
+@media only screen and (max-width: 768px) {
+  .box {
+    border-radius: 0px !important;
+  }
+}
+
 .chart-page,
 .chart-page * {
   border: none !important;
@@ -52,4 +66,14 @@ body {
 
 .drag-handle {
   cursor: grab !important;
+}
+
+@media (max-width: 768px) {
+  #tv-chart {
+    height: 40vh !important;
+  }
+
+  #tv-chart iframe {
+    height: 40vh !important;
+  }
 }

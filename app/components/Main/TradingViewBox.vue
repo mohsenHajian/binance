@@ -1,6 +1,6 @@
 <template>
-  <div class="relative drag-handle max-h-[600px]">
-    <div class="absolute top-2 right-2 z-50 cursor-pointer">
+  <div class="relative drag-handle">
+    <div class="absolute top-1 right-1 z-50 cursor-pointer">
       <button
         @click="toggleFullscreen"
         class="px-3 py-1 bg-[#0F0F0F] text-white rounded"
@@ -15,7 +15,7 @@
 
     <div
       id="tv-chart"
-      class="relative z-30 w-full h-full overflow-hidden rounded-lg"
+      class="relative z-30 w-full min-h-[40vh] overflow-hidden rounded-lg"
     ></div>
   </div>
 </template>

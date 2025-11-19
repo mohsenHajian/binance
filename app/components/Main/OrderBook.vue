@@ -85,15 +85,38 @@ const maxBidSum = computed(() =>
   sortedBids.value.length ? Math.max(...sortedBids.value.map((i) => i.sum)) : 1
 );
 
+// ---------- DETECT MOBILE ----------
+const isMobile = computed(() => window.innerWidth < 768);
+
+// ---------- ASK BACKGROUND ----------
 const askBgStyle = (sum) => {
   const pct = (sum / maxAskSum.value) * 100;
+
+  // Mobile: red filling left → right
+  if (isMobile.value) {
+    return {
+      background: `linear-gradient(to right, rgba(246,70,93,0.18) ${pct}%, transparent 0%)`,
+    };
+  }
+
+  // Desktop: right → left
   return {
     background: `linear-gradient(to left, rgba(246,70,93,0.18) ${pct}%, transparent 0%)`,
   };
 };
 
+// ---------- BID BACKGROUND ----------
 const bidBgStyle = (sum) => {
   const pct = (sum / maxBidSum.value) * 100;
+
+  // Mobile: green filling right → left
+  if (isMobile.value) {
+    return {
+      background: `linear-gradient(to left, rgba(14,203,129,0.18) ${pct}%, transparent 0%)`,
+    };
+  }
+
+  // Desktop: right → left
   return {
     background: `linear-gradient(to left, rgba(14,203,129,0.18) ${pct}%, transparent 0%)`,
   };
@@ -156,39 +179,45 @@ onUnmounted(() => ws && ws.close());
 </script>
 
 <template>
-  <div class="flex flex-col h-[45vh] box text-[#EAECEF] text-xs rounded drag-handle">
-    <!-- Header -->
+  <div
+    class="flex flex-col h-[45vh] text-[#EAECEF] text-xs box rounded drag-handle"
+  >
     <div
-      class="flex justify-between px-4 min-h-[40px] border-b border-[#333B47] items-center font-bold"
+      class="hidden md:flex justify-between px-4 min-h-[40px] border-b border-[#333B47] items-center font-bold"
     >
       <span>Order Book</span>
     </div>
 
-    <!-- Columns -->
-    <div class="grid grid-cols-3 px-3 py-3 text-[11px] opacity-60">
+    <div class="hidden md:grid grid-cols-3 px-3 py-3 text-[11px] opacity-60">
       <span>Price (USDT)</span>
       <span>Size (BTC)</span>
       <span>Sum (BTC)</span>
     </div>
 
-    <div class="flex flex-col overflow-y-auto grow">
+    <div class="flex flex-row-reverse md:flex-col overflow-y-auto grow">
       <!-- ASKS -->
-      <div class="flex flex-col-reverse">
+      <div class="flex flex-col-reverse max-md:w-1/2 max-md:mt-2 max-md:h-fit">
         <div
           v-for="(row, i) in sortedAsks"
           :key="'ask-' + i"
-          class="grid grid-cols-3 px-3 py-[2px] my-[1px] rounded relative"
+          class="flex md:grid justify-between md:grid-cols-3 px-3 py-[2px] my-[1px] rounded relative font-normal"
           :style="askBgStyle(row.sum)"
         >
           <span class="text-[#F6465D]">{{ row.price.toFixed(1) }}</span>
           <span>{{ row.amount.toFixed(3) }}</span>
-          <span>{{ row.sum.toFixed(3) }}</span>
+          <span class="hidden md:inline-block">{{ row.sum.toFixed(3) }}</span>
+        </div>
+        <div
+          class="flex md:hidden my-1 items-center justify-between text-xs text-[#707A8A] px-3"
+        >
+          <span>Size</span>
+          <span>Price</span>
         </div>
       </div>
 
       <!-- MID PRICE -->
       <div
-        class="text-left py-2 font-semibold text-lg flex items-center justify-start ml-3 gap-2 transition-all"
+        class="text-left py-2 font-semibold text-lg hidden md:flex items-center justify-start ml-3 gap-2 transition-all"
         :class="{
           'text-[#0ECB81]': priceDirection === 'up',
           'text-[#F6465D]': priceDirection === 'down',
@@ -210,16 +239,24 @@ onUnmounted(() => ws && ws.close());
       </div>
 
       <!-- BIDS -->
-      <div class="flex flex-col">
+      <div
+        class="flex flex-col-reverse md:flex-col max-md:w-1/2 max-md:mt-2 max-md:h-fit"
+      >
         <div
           v-for="(row, i) in sortedBids"
           :key="'bid-' + i"
-          class="grid grid-cols-3 px-3 py-[2px] my-[1px] rounded relative"
+          class="flex md:grid justify-between md:grid-cols-3 px-3 py-[2px] my-[1px] rounded relative font-normal"
           :style="bidBgStyle(row.sum)"
         >
           <span class="text-[#0ECB81]">{{ row.price.toFixed(1) }}</span>
           <span>{{ row.amount.toFixed(3) }}</span>
-          <span>{{ row.sum.toFixed(3) }}</span>
+          <span class="hidden md:inline-block">{{ row.sum.toFixed(3) }}</span>
+        </div>
+        <div
+          class="flex md:hidden my-1 items-center justify-between text-xs text-[#707A8A] px-3"
+        >
+          <span>Size</span>
+          <span>Price</span>
         </div>
       </div>
     </div>

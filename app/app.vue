@@ -1,8 +1,10 @@
 <template>
-  <div class="flex flex-col w-full">
+  <div class="flex flex-col w-full overflow-x-hidden">
     <TheHeader />
 
-    <div class="flex gap-0.5">
+    <!-- Desktop layout -->
+    <div v-if="innerWidth >= 768" class="flex gap-0.5 mb-10">
+      <!-- Left Column -->
       <div class="left-column" ref="leftColumn">
         <BinanceTrack
           :symbol="symbol"
@@ -11,20 +13,28 @@
         />
         <LandingDetails :style="{ width: xlWidth + 'px' }" />
         <TradingViewBox :style="{ width: lgWidth + 'px' }" />
-        <OrderBook :style="{ width: smWidth + 'px' }" />
+        <OrderBook :style="{ width: (orderBookWidth || smWidth) + 'px' }" />
         <TradeHistory :style="{ width: xlWidth + 'px' }" />
       </div>
 
+      <!-- Right Column -->
       <div class="right-column" ref="rightColumn">
         <TradingBox :style="{ width: smWidth + 'px' }" />
         <AccountBox :style="{ width: smWidth + 'px' }" />
       </div>
     </div>
+
+    <!-- Mobile layout -->
+    <div v-if="innerWidth < 768" class="flex flex-col md:hidden gap-1.5 mb-10">
+      <LandingDetails />
+      <SwitchContent />
+      <TradeHistory />
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, onBeforeUnmount, nextTick } from "vue";
 import { useRouter, useRoute } from "#imports";
 import Sortable from "sortablejs";
 
@@ -36,92 +46,111 @@ import TradingViewBox from "./components/Main/TradingViewBox.vue";
 import AccountBox from "./components/Sidebar/AccountBox.vue";
 import TradeHistory from "./components/Main/TradeHistory.vue";
 import OrderBook from "./components/Main/OrderBook.vue";
+import SwitchContent from "./components/Main/SwitchContent.vue";
 
+// Router & symbol
 const route = useRoute();
 const router = useRouter();
-
 const symbol = ref(route.query.symbol || "BTCUSDT");
-
 const updateSymbol = (newSymbol) => {
   symbol.value = newSymbol;
   router.replace({ query: { ...route.query, symbol: newSymbol } });
 };
 
-const smallBoxWidth = 320;
-const allBoxes = ref([
-  { id: 1, label: "Box 1", h: "220px", width: "320px" },
-  { id: 2, label: "Box 2", h: "220px", width: "320px" },
-  { id: 3, label: "Box 3", h: "220px", width: "320px" },
-  { id: 4, label: "Box 4", h: "50vh", width: "80%" },
-  { id: 5, label: "Box 5", h: "220px", width: "320px" },
-  { id: 6, label: "Box 6", h: "50px", width: "100%" },
-  { id: 7, label: "Box 7", h: "50px", width: "100%" },
-  { id: 8, label: "Box 8", h: "220px", width: "100%" },
-  { id: 9, label: "Box 9", h: "220px", width: "100%" },
-  { id: 10, label: "Box 10", h: "220px", width: "100%" },
-]);
+const innerWidth = ref(0);
 
-const rightBoxes = ref(allBoxes.value.slice(0, 3));
-const leftBoxes = ref(allBoxes.value.slice(3));
+// Box widths
+const smWidth = 320;
+const xlWidth = ref(0);
+const lgWidth = ref(0);
+const orderBookWidth = ref(0);
 
+// Refs for columns
 const leftColumn = ref(null);
 const rightColumn = ref(null);
 
-const xlWidth = ref(0);
-const lgWidth = ref(0);
-const smWidth = ref(320);
+// Boxes
+const allBoxes = ref([
+  { id: 1, label: "Box 1", h: "220px" },
+  { id: 2, label: "Box 2", h: "220px" },
+  { id: 3, label: "Box 3", h: "220px" },
+  { id: 4, label: "Box 4", h: "50vh" },
+  { id: 5, label: "Box 5", h: "220px" },
+  { id: 6, label: "Box 6", h: "50px" },
+  { id: 7, label: "Box 7", h: "50px" },
+  { id: 8, label: "Box 8", h: "220px" },
+  { id: 9, label: "Box 9", h: "220px" },
+  { id: 10, label: "Box 10", h: "220px" },
+]);
 
+// Split boxes for left/right
+const rightBoxes = ref(allBoxes.value.slice(0, 3));
+const leftBoxes = ref(allBoxes.value.slice(3));
+
+// Function to update widths on resize
 const updateLeftBoxesWidth = () => {
-  const rightWidth = smallBoxWidth;
-  const gap = 6;
-  const leftWidth = window.innerWidth - rightWidth - gap;
+  innerWidth.value = window.innerWidth;
 
-  leftBoxes.value.forEach((box) => {
-    if (box.width === "100%") {
-      box.width = leftWidth + "px";
-      xlWidth.value = leftWidth;
-    } else if (box.width === "80%") {
-      box.width = leftWidth - smallBoxWidth - 6 + "px";
-      lgWidth.value = leftWidth - smallBoxWidth - 6;
-    }
-  });
+  const gap = 6;
+  const leftWidth = window.innerWidth - smWidth - gap;
+
+  xlWidth.value = leftWidth;
+  lgWidth.value = leftWidth - smWidth - gap;
+
+  if (window.innerWidth <= 1024) {
+    lgWidth.value = leftWidth;
+    orderBookWidth.value = leftWidth;
+  } else {
+    lgWidth.value = leftWidth - smWidth - gap;
+    orderBookWidth.value = 0;
+  }
 };
 
-onMounted(() => {
+onMounted(async () => {
+  innerWidth.value = window.innerWidth;
+
   updateLeftBoxesWidth();
   window.addEventListener("resize", updateLeftBoxesWidth);
 
+  // Wait for DOM to render because v-show keeps DOM, v-if doesn't
+  await nextTick();
+
   const groupOptions = { name: "boxes", pull: true, put: true };
 
-  Sortable.create(leftColumn.value, {
-    group: groupOptions,
-    animation: 150,
-    handle: ".drag-handle",
-    ghostClass: "drag-ghost",
-    onStart(evt) {
-      evt.item.style.visibility = "hidden";
-    },
-    onEnd(evt) {
-      evt.item.style.visibility = "visible";
-      const moved = leftBoxes.value.splice(evt.oldIndex, 1)[0];
-      leftBoxes.value.splice(evt.newIndex, 0, moved);
-    },
-  });
+  // Init Sortable only when elements exist
+  if (leftColumn.value) {
+    Sortable.create(leftColumn.value, {
+      group: groupOptions,
+      animation: 150,
+      handle: ".drag-handle",
+      ghostClass: "drag-ghost",
+      onStart(evt) {
+        evt.item.style.visibility = "hidden";
+      },
+      onEnd(evt) {
+        evt.item.style.visibility = "visible";
+        const moved = leftBoxes.value.splice(evt.oldIndex, 1)[0];
+        leftBoxes.value.splice(evt.newIndex, 0, moved);
+      },
+    });
+  }
 
-  Sortable.create(rightColumn.value, {
-    group: groupOptions,
-    animation: 150,
-    handle: ".drag-handle",
-    ghostClass: "drag-ghost",
-    onStart(evt) {
-      evt.item.style.visibility = "hidden";
-    },
-    onEnd(evt) {
-      evt.item.style.visibility = "visible";
-      const moved = rightBoxes.value.splice(evt.oldIndex, 1)[0];
-      rightBoxes.value.splice(evt.newIndex, 0, moved);
-    },
-  });
+  if (rightColumn.value) {
+    Sortable.create(rightColumn.value, {
+      group: groupOptions,
+      animation: 150,
+      handle: ".drag-handle",
+      ghostClass: "drag-ghost",
+      onStart(evt) {
+        evt.item.style.visibility = "hidden";
+      },
+      onEnd(evt) {
+        evt.item.style.visibility = "visible";
+        const moved = rightBoxes.value.splice(evt.oldIndex, 1)[0];
+        rightBoxes.value.splice(evt.newIndex, 0, moved);
+      },
+    });
+  }
 });
 
 onBeforeUnmount(() => {
@@ -136,10 +165,6 @@ onBeforeUnmount(() => {
   gap: 6px;
   row-gap: 6px;
   align-content: flex-start;
-}
-
-.left-column .box:last-child {
-  margin-bottom: 0;
 }
 
 .right-column {
