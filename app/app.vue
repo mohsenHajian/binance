@@ -18,18 +18,12 @@
         >
           hi
         </div>
+        <TradeHistory :style="{ width: xlWidth + 'px' }" />
       </div>
 
       <div class="right-column" ref="rightColumn">
         <TradingBox :style="{ width: smWidth + 'px' }" />
-        <div
-          v-for="(box, index) in rightBoxes"
-          :key="box.id"
-          class="box flex items-center justify-center"
-          :style="{ height: '48vh', width: box.width }"
-        >
-          {{ box.label }}
-        </div>
+        <AccountBox :style="{ width: smWidth + 'px' }" />
       </div>
     </div>
   </div>
@@ -45,6 +39,8 @@ import BinanceTrack from "./components/Main/BinanceTrack.vue";
 import LandingDetails from "./components/Main/LandingDetails.vue";
 import TradingBox from "./components/Sidebar/TradingBox.vue";
 import TradingViewBox from "./components/Main/TradingViewBox.vue";
+import AccountBox from "./components/Sidebar/AccountBox.vue";
+import TradeHistory from "./components/Main/TradeHistory.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -82,7 +78,7 @@ const smWidth = ref(320);
 
 const updateLeftBoxesWidth = () => {
   const rightWidth = smallBoxWidth;
-  const gap = 17;
+  const gap = 6;
   const leftWidth = window.innerWidth - rightWidth - gap;
 
   leftBoxes.value.forEach((box) => {

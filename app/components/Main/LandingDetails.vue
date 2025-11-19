@@ -1,6 +1,6 @@
 <template>
   <div
-    class="box h-[56px] bg-gray-800 text-white px-4 rounded-md mx-auto text-[12px] flex items-center"
+    class="box h-[56px] bg-gray-800 text-white px-4 rounded-md mx-auto text-[12px] flex items-center !m-0"
   >
     <div class="flex items-center gap-2 mb-2 cursor-default">
       <img :src="iconUrl" class="w-6 h-6" />

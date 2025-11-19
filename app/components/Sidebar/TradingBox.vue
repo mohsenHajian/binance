@@ -1,5 +1,5 @@
 <template>
-  <div class="box h-[49vh] flex flex-col px-4 py-3 !cursor-default">
+  <div class="box h-[45vh] flex flex-col px-4 py-3 !cursor-default">
     <div class="flex items-center justify-between w-full drag-handle">
       <div class="flex items-center gap-2 mb-2.5">
         <button

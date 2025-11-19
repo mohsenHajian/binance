@@ -15,7 +15,7 @@
 
     <div
       id="tv-chart"
-      class="relative z-30 !h-[60vh] w-full overflow-hidden rounded-lg"
+      class="relative z-30 !h-[40vh] w-full overflow-hidden rounded-lg"
     ></div>
   </div>
 </template>

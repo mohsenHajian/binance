@@ -5,7 +5,7 @@ body {
 }
 
 * {
-  scrollbar-width: thin; /* برای Firefox */
+  scrollbar-width: thin;
   scrollbar-color: #4e4e4e #1a1a1a; /* thumb | track */
 }
 
@@ -30,7 +30,7 @@ body {
 }
 
 .box {
-  border-radius: 10px;
+  border-radius: 6px;
   color: white;
   font-weight: bold;
   display: flex;
@@ -39,6 +39,7 @@ body {
   cursor: grab;
   user-select: none;
   background-color: #181a20;
+  margin: 0 !important;
 }
 
 .chart-page,
