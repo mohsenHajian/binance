@@ -1,75 +1,22 @@
-# Nuxt Minimal Starter
+📊 Crypto Trading Platform (Binance-Like) — Built with Nuxt 4 & Tailwind CSS
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+This project is a modern, fast, and fully responsive crypto trading interface inspired by Binance.
+Developed using Nuxt 4, Tailwind CSS, and running on Node.js v22.21.1, it delivers a clean UI, smooth interactions, and a scalable architecture ideal for real-world trading platforms.
 
-## Setup
+🚀 Features
 
-Make sure to install dependencies:
+Modern & responsive UI optimized for a seamless trading experience
 
-```bash
-# npm
-npm install
+Built with Nuxt 4 for high performance and modular development
 
-# pnpm
-pnpm install
+Styled using Tailwind CSS with clean, reusable design components
 
-# yarn
-yarn install
+Node.js v22.21.1 compatibility
 
-# bun
-bun install
-```
+Production-ready structure for future integrations (API, WebSocket, charts, etc.)
 
-## Development Server
+Easily extendable for advanced features like order books, transactions, and live price updates
 
-Start the development server on `http://localhost:3000`:
+🎯 Purpose
 
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+A professional trading dashboard layout designed for learning, customization, or building a complete crypto exchange front-end.
