@@ -67,7 +67,9 @@ export function useFuturesDetails(symbolRef) {
       indexPrice.value = parseFloat(markData.indexPrice);
       fundingRate.value = parseFloat(markData.lastFundingRate) * 100;
       nextFundingTime = markData.nextFundingTime;
-      startCountdown();
+
+      // Start countdown only on client
+      if (process.client) startCountdown();
     } catch (err) {
       console.error("Failed to fetch snapshot:", err);
     }
@@ -75,7 +77,9 @@ export function useFuturesDetails(symbolRef) {
 
   // -------- WebSocket --------
   const startSocket = () => {
+    if (!process.client) return; // Only run on client
     if (ws) ws.close();
+
     const stream = `${_symbol.value.toLowerCase()}@ticker/${_symbol.value.toLowerCase()}@markPrice`;
     ws = new WebSocket(`wss://fstream.binance.com/stream?streams=${stream}`);
 
@@ -108,11 +112,22 @@ export function useFuturesDetails(symbolRef) {
   // -------- Refresh Symbol --------
   const refreshSymbol = async (newSymbol) => {
     _symbol.value = newSymbol.toUpperCase();
-
     await fetchSnapshot();
     startSocket();
   };
 
+  // -------- Lifecycle Hooks --------
+  onMounted(() => {
+    // Initial load
+    refreshSymbol(_symbol.value);
+  });
+
+  onUnmounted(() => {
+    if (ws) ws.close();
+    clearInterval(countdownTimer);
+  });
+
+  // -------- Watch for symbol changes --------
   watch(
     symbolRef,
     async (newSymbol) => {
@@ -121,15 +136,6 @@ export function useFuturesDetails(symbolRef) {
     },
     { immediate: true }
   );
-
-  // onMounted(async () => {
-  //   await refreshSymbol(_symbol.value);
-  // });
-
-  onUnmounted(() => {
-    if (ws) ws.close();
-    clearInterval(countdownTimer);
-  });
 
   const setSymbol = (newSymbol) => {
     symbolRef.value = newSymbol;

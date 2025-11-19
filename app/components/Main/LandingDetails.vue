@@ -4,7 +4,16 @@
   >
     <div class="flex md:flex-row flex-col items-center">
       <div class="flex items-center gap-2 mb-2 cursor-default">
-        <img :src="iconUrl" class="w-6 h-6 hidden md:flex" />
+        <img
+          v-if="iconUrl"
+          :src="iconUrl || ''"
+          class="w-6 h-6 hidden md:flex"
+        />
+        <img
+          v-else
+          src="../../assets/img/coin.png"
+          class="w-6 h-6 hidden md:flex"
+        />
         <h2 class="font-semibold text-[20px]">
           {{ symbol || "BNBUSDT" }}
         </h2>
@@ -180,8 +189,10 @@ const fundingRateDisplay = computed(() =>
 const iconUrl = computed(() => {
   const map = { btc: 1, eth: 1027, bnb: 1839 };
   const s = symbol.value.replace("USDT", "").toLowerCase();
-  const coinId = map[s] || 1;
-  return `https://s2.coinmarketcap.com/static/img/coins/64x64/${coinId}.png`;
+  const coinId = map[s];
+  return coinId
+    ? `https://s2.coinmarketcap.com/static/img/coins/64x64/${coinId}.png`
+    : null;
 });
 
 const checkScreen = () => {

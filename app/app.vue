@@ -30,6 +30,7 @@
       <SwitchContent />
       <TradeHistory />
     </div>
+    <TheFooter />
   </div>
 </template>
 
@@ -40,6 +41,7 @@ import Sortable from "sortablejs";
 
 import { useBoxStatus } from "@/stores/boxStatus";
 import TheHeader from "./components/base/TheHeader.vue";
+import TheFooter from "./components/base/TheFooter.vue";
 import BinanceTrack from "./components/Main/BinanceTrack.vue";
 import LandingDetails from "./components/Main/LandingDetails.vue";
 import TradingBox from "./components/Sidebar/TradingBox.vue";

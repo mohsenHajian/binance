@@ -9,11 +9,11 @@
       <div
         v-for="symbolItem in symbols"
         :key="symbolItem"
-        class="flex gap-1 text-xs min-w-[100px]"
+        class="flex gap-1 text-xs min-w-[100px] cursor-pointer"
+        @click="changeSymbol(symbolItem)"
       >
         <span
           class="text-white font-normal hover:text-gray-400 transition-all cursor-pointer"
-          @click="changeSymbol(symbolItem)"
         >
           {{ symbolItem }}
         </span>
