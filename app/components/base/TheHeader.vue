@@ -4,10 +4,10 @@
   >
     <div class="flex flex-nowrap items-center pl-2 md:pl-4">
       <svg
-        class="w-6 h-fit text-white mx-2"
+        class="w-6 h-6 text-white mx-2"
         xmlns="http://www.w3.org/2000/svg"
-        width="1024"
-        height="1024"
+        width="24"
+        height="24"
         viewBox="0 0 1024 1024"
       >
         <path
@@ -15,6 +15,7 @@
           d="M512 128L128 447.936V896h255.936V640H640v256h255.936V447.936z"
         />
       </svg>
+
       <img src="/logo.png" alt="logo" class="mx-1 md:mx-2 h-[64px]" />
       <div class="hidden md:flex items-center max-w-[0px]">
         <TheDropDown title="Futures" :items="futuresMenu" />

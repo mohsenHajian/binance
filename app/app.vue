@@ -38,6 +38,7 @@ import { ref, onMounted, onBeforeUnmount, nextTick } from "vue";
 import { useRouter, useRoute } from "#imports";
 import Sortable from "sortablejs";
 
+import { useBoxStatus } from "@/stores/boxStatus";
 import TheHeader from "./components/base/TheHeader.vue";
 import BinanceTrack from "./components/Main/BinanceTrack.vue";
 import LandingDetails from "./components/Main/LandingDetails.vue";
@@ -51,6 +52,7 @@ import SwitchContent from "./components/Main/SwitchContent.vue";
 // Router & symbol
 const route = useRoute();
 const router = useRouter();
+const boxStore = useBoxStatus();
 const symbol = ref(route.query.symbol || "BTCUSDT");
 const updateSymbol = (newSymbol) => {
   symbol.value = newSymbol;
@@ -104,7 +106,19 @@ const updateLeftBoxesWidth = () => {
     lgWidth.value = leftWidth - smWidth - gap;
     orderBookWidth.value = 0;
   }
+  if (!boxStore.getIsOrderBookVisible()) {
+    lgWidth.value = xlWidth.value;
+  }
 };
+
+watch(
+  () => boxStore.getIsOrderBookVisible(),
+  (newVal, oldVal) => {
+    if (!newVal) {
+      lgWidth.value = xlWidth.value;
+    }
+  }
+);
 
 onMounted(async () => {
   innerWidth.value = window.innerWidth;

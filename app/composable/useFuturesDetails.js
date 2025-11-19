@@ -68,8 +68,6 @@ export function useFuturesDetails(symbolRef) {
       fundingRate.value = parseFloat(markData.lastFundingRate) * 100;
       nextFundingTime = markData.nextFundingTime;
       startCountdown();
-      store.setPrice(perpPrice.value);
-      store.setRealTimePrice(perpPrice.value);
     } catch (err) {
       console.error("Failed to fetch snapshot:", err);
     }
@@ -104,7 +102,6 @@ export function useFuturesDetails(symbolRef) {
         nextFundingTime = data.T;
         startCountdown();
       }
-      store.setRealTimePrice(perpPrice.value);
     };
   };
 
@@ -112,23 +109,22 @@ export function useFuturesDetails(symbolRef) {
   const refreshSymbol = async (newSymbol) => {
     _symbol.value = newSymbol.toUpperCase();
 
-    // Reset store for new symbol
-
-    store.setPrice(null);
-
     await fetchSnapshot();
     startSocket();
   };
 
-  watch(symbolRef, async (newSymbol) => {
-    if (newSymbol) {
+  watch(
+    symbolRef,
+    async (newSymbol) => {
+      if (!newSymbol) return;
       await refreshSymbol(newSymbol);
-    }
-  });
+    },
+    { immediate: true }
+  );
 
-  onMounted(async () => {
-    await refreshSymbol(_symbol.value);
-  });
+  // onMounted(async () => {
+  //   await refreshSymbol(_symbol.value);
+  // });
 
   onUnmounted(() => {
     if (ws) ws.close();

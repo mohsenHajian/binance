@@ -125,7 +125,9 @@ import { ref, watch, onMounted, onBeforeUnmount, computed } from "vue";
 import { useRoute } from "#imports";
 import { useFuturesDetails } from "../../composable/useFuturesDetails";
 import InfoItem from "../utils/InfoItem.vue";
+import { useFuturesStore } from "../../stores/futures";
 
+const store = useFuturesStore();
 const route = useRoute();
 const querySymbol = ref("BTCUSDT");
 
@@ -165,6 +167,8 @@ watch(perpPrice, (val) => {
       val > prevPrice.value ? "up" : val < prevPrice.value ? "down" : "neutral";
   }
   prevPrice.value = val;
+  store.setRealTimePrice(perpPrice.value);
+  store.setPrice(perpPrice.value);
 });
 
 const fundingRateDisplay = computed(() =>

@@ -1,5 +1,22 @@
 <template>
-  <div class="flex flex-col box drag-handle min-h-[45vh]">
+  <div
+    v-if="visible"
+    @mouseenter="hover = true"
+    @mouseleave="hover = false"
+    class="flex flex-col box drag-handle min-h-[45vh] relative"
+  >
+    <svg
+      v-if="hover"
+      @click="visible = false"
+      class="md:flex hidden w-4 opacity-[0.5] cursor-pointer absolute top-0 right-0 z-10"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm3.637 6.363a.9.9 0 00-1.274 0L12 10.727 9.637 8.363l-.069-.061a.9.9 0 00-1.266 1.266l.061.069L10.727 12l-2.364 2.363a.9.9 0 001.274 1.274L12 13.273l2.363 2.364.069.061a.9.9 0 001.266-1.266l-.061-.069L13.273 12l2.364-2.363a.9.9 0 000-1.274z"
+        fill="currentColor"
+      ></path>
+    </svg>
     <div
       class="flex items-center w-full px-4 text-[#EAECEF] h-10 border-b border-[#333B47] text-sm"
     >
@@ -76,3 +93,8 @@
     </div>
   </div>
 </template>
+<script setup>
+import { ref } from "vue";
+const hover = ref(false);
+const visible = ref(true);
+</script>

@@ -2,9 +2,11 @@
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import { useRoute } from "#imports";
 import { useFuturesStore } from "@/stores/futures";
+import { useBoxStatus } from "@/stores/boxStatus";
 
 // --- Store & Route ---
 const store = useFuturesStore();
+const boxStore = useBoxStatus();
 const route = useRoute();
 
 // --- Symbol ---
@@ -13,12 +15,13 @@ const symbol = ref((route.query.symbol || "BTCUSDT").toString().toUpperCase());
 // --- Order Book ---
 const asks = ref([]);
 const bids = ref([]);
+const hover = ref(false);
+const visible = ref(true);
 
 // --- Price ---
 const currentPrice = computed(() => store.geRealTimePrice());
 const lastPrice = ref(null);
 const priceDirection = ref(null);
-const priceFlash = ref(false);
 
 // --- WebSocket ---
 let ws = null;
@@ -47,15 +50,12 @@ const fetchSnapshot = async () => {
 
 // ---------- WATCH PRICE ----------
 watch(
-  () => currentPrice.value,
+  () => store.geRealTimePrice(),
   (newVal, oldVal) => {
     if (!oldVal) return;
 
     priceDirection.value =
       newVal > oldVal ? "up" : newVal < oldVal ? "down" : null;
-
-    priceFlash.value = true;
-    setTimeout(() => (priceFlash.value = false), 200);
 
     lastPrice.value = oldVal;
   }
@@ -68,6 +68,11 @@ const calcCumulative = (arr) => {
     sum += i.amount;
     return { ...i, sum };
   });
+};
+
+const hideOrderBook = () => {
+  visible.value = false;
+  boxStore.setIsOrderBookVisible(false);
 };
 
 const sortedAsks = computed(() =>
@@ -180,8 +185,23 @@ onUnmounted(() => ws && ws.close());
 
 <template>
   <div
-    class="flex flex-col h-[45vh] text-[#EAECEF] text-xs box rounded drag-handle"
+    v-if="visible"
+    @mouseenter="hover = true"
+    @mouseleave="hover = false"
+    class="flex flex-col h-[45vh] text-[#EAECEF] text-xs box rounded drag-handle relative"
   >
+    <svg
+      v-if="hover"
+      @click="hideOrderBook"
+      class="hidden md:flex w-4 opacity-[0.5] cursor-pointer absolute top-0 right-0 z-10"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm3.637 6.363a.9.9 0 00-1.274 0L12 10.727 9.637 8.363l-.069-.061a.9.9 0 00-1.266 1.266l.061.069L10.727 12l-2.364 2.363a.9.9 0 001.274 1.274L12 13.273l2.363 2.364.069.061a.9.9 0 001.266-1.266l-.061-.069L13.273 12l2.364-2.363a.9.9 0 000-1.274z"
+        fill="currentColor"
+      ></path>
+    </svg>
     <div
       class="hidden md:flex justify-between px-4 min-h-[40px] border-b border-[#333B47] items-center font-bold"
     >
@@ -221,7 +241,6 @@ onUnmounted(() => ws && ws.close());
         :class="{
           'text-[#0ECB81]': priceDirection === 'up',
           'text-[#F6465D]': priceDirection === 'down',
-          'animate-pulse': priceFlash,
         }"
       >
         <span>{{ currentPrice?.toFixed(1) }}</span>
