@@ -1,6 +1,5 @@
 <template>
   <div class="box h-[49vh] flex flex-col px-4 py-3 !cursor-default">
-    <!-- Drag handle بالا -->
     <div class="flex items-center justify-between w-full drag-handle">
       <div class="flex items-center gap-2 mb-2.5">
         <button
@@ -8,11 +7,13 @@
         >
           Cross
         </button>
+
         <button
           class="flex items-center justify-center rounded-[4px] bg-[#2E343F] text-xs w-[70px] h-6 active:opacity-[0.8]"
         >
           20x
         </button>
+
         <button
           class="flex items-center justify-center rounded-[4px] bg-[#2E343F] text-xs w-fit h-6 px-3 active:opacity-[0.8]"
         >
@@ -32,7 +33,6 @@
       </svg>
     </div>
 
-    <!-- تب‌ها (drag handle) -->
     <div
       class="flex items-center w-full justify-between mt-3 text-sm border-b border-[#333B47] pb-1 drag-handle"
     >
@@ -69,12 +69,10 @@
       </svg>
     </div>
 
-    <!-- موجودی -->
     <div class="text-xs text-[#4F5867] my-2.5">
       Avbl<span class="text-[#EAECEF]"> - USDT</span>
     </div>
 
-    <!-- Price input -->
     <div class="text-xs text-[#707A8A] font-normal mb-1">Price</div>
     <div class="flex items-center gap-2 mb-1">
       <div v-if="isPriceFormat" class="relative w-full">
@@ -88,9 +86,83 @@
           >USDT</span
         >
       </div>
+      <div v-else class="relative inline-block text-left w-full rounded-[8px]">
+        <!-- Dropdown button -->
+        <button
+          @click="isPriceDropDownOpen = !isPriceDropDownOpen"
+          class="inline-flex w-full justify-between gap-x-1.5 rounded-md bg-transparent px-3 py-2 text-sm font-semibold text-white border border-[#434C5A] focus:outline-none focus:border-[#F0B90B] hover:border-[#F0B90B] transition-all"
+        >
+          {{ priceDropDownValue }}
+          <svg
+            class="-mr-1 h-5 w-5 text-gray-400 transition-all"
+            :class="isPriceDropDownOpen && 'rotate-[180deg]'"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </button>
+
+        <!-- Dropdown menu -->
+        <div
+          v-show="isPriceDropDownOpen"
+          @click.outside="isPriceDropDownOpen = false"
+          class="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-gray-800 shadow-lg ring-1 ring-white/10 z-[40] focus:outline-none transition transform scale-95 opacity-0"
+          :class="{ 'scale-100 opacity-100': isPriceDropDownOpen }"
+        >
+          <div class="py-1">
+            <a
+              href="#"
+              @click="priceDropDownValue = 'Counterparty 1'"
+              :class="
+                priceDropDownValue === 'Counterparty 1' ? 'bg-white/5' : ''
+              "
+              class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white"
+            >
+              Counterparty 1
+            </a>
+            <a
+              href="#"
+              @click="priceDropDownValue = 'Counterparty 5'"
+              :class="
+                priceDropDownValue === 'Counterparty 5' ? 'bg-white/5' : ''
+              "
+              class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white"
+            >
+              Counterparty 5
+            </a>
+            <a
+              href="#"
+              @click="priceDropDownValue = 'Queue 1'"
+              :class="priceDropDownValue === 'Queue 1' ? 'bg-white/5' : ''"
+              class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white"
+            >
+              Queue 1
+            </a>
+            <a
+              href="#"
+              @click="priceDropDownValue = 'Queue 5'"
+              :class="priceDropDownValue === 'Queue 5' ? 'bg-white/5' : ''"
+              class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white"
+            >
+              Queue 5
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <button
+        @click="isPriceFormat = !isPriceFormat"
+        class="bg-transparent text-xs w-[56px] h-10 border border-[#434C5A] rounded-[8px] focus:border-[#ffffff] transition-all"
+      >
+        BBO
+      </button>
     </div>
 
-    <!-- Size input -->
     <div class="text-xs text-[#707A8A] font-normal mb-1">Size</div>
     <div class="flex items-center gap-2">
       <div class="relative w-full">
@@ -103,9 +175,8 @@
       </div>
     </div>
 
-    <!-- Slider -->
     <div
-      class="w-full px-4 mt-5 mb-2 slider-container select-none z-[50] cursor-default"
+      class="w-full px-4 mt-5 mb-2 slider-container select-none z-[30] cursor-default"
     >
       <div
         class="relative w-full h-0.5 bg-[#434C5A] rounded-full"
@@ -140,7 +211,6 @@
       </div>
     </div>
 
-    <!-- Buttons -->
     <div class="mt-4 flex w-full flex-col gap-2.5">
       <button
         class="w-full h-9 bg-[#FCD535] text-[#202630] text-sm rounded-[6px] cursor-pointer active:opacity-[0.7] transition-all"
@@ -157,7 +227,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from "vue";
 import { useFuturesStore } from "~/stores/futures";
 
 const tabs = ["Limit", "Market", "Stop Limit"];
@@ -168,6 +238,7 @@ const isPriceDropDownOpen = ref(false);
 const priceDropDownValue = ref("Counterparty 1");
 
 const futuresStore = useFuturesStore();
+
 const price = ref(0);
 
 const position = ref(0);
@@ -194,6 +265,7 @@ const onDrag = (e) => {
 watch(
   () => futuresStore.getPrice(),
   (newVal) => {
+    console.log("newVal", newVal);
     if (newVal) price.value = newVal;
   }
 );
@@ -204,14 +276,21 @@ const formattedPrice = computed({
   },
   set(value) {
     const number = Number(value.replace(/,/g, ""));
-    price.value = !isNaN(number) ? number : 0;
+    if (!isNaN(number)) {
+      price.value = number;
+    } else {
+      price.value = 0;
+    }
   },
 });
 
 const underlineStyle = computed(() => {
   if (!tabRefs.value[activeTab.value]) return {};
   const el = tabRefs.value[activeTab.value];
-  return { width: `${el.offsetWidth}px`, left: `${el.offsetLeft}px` };
+  return {
+    width: `${el.offsetWidth}px`,
+    left: `${el.offsetLeft}px`,
+  };
 });
 
 onMounted(() => {
@@ -219,8 +298,8 @@ onMounted(() => {
   window.addEventListener("mouseup", stopDrag);
   window.addEventListener("touchmove", onDrag);
   window.addEventListener("touchend", stopDrag);
+  nextTick(() => {});
 });
-
 onBeforeUnmount(() => {
   window.removeEventListener("mousemove", onDrag);
   window.removeEventListener("mouseup", stopDrag);
