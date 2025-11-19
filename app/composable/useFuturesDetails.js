@@ -69,6 +69,7 @@ export function useFuturesDetails(symbolRef) {
       nextFundingTime = markData.nextFundingTime;
       startCountdown();
       store.setPrice(perpPrice.value);
+      store.setRealTimePrice(perpPrice.value);
     } catch (err) {
       console.error("Failed to fetch snapshot:", err);
     }
@@ -83,7 +84,6 @@ export function useFuturesDetails(symbolRef) {
     ws.onmessage = (msg) => {
       const { stream, data } = JSON.parse(msg.data);
 
-      // فقط اگر پیام مربوط به Symbol فعلی باشه آپدیت کن
       if (data.s !== _symbol.value) return;
 
       if (stream.endsWith("@ticker")) {
@@ -104,6 +104,7 @@ export function useFuturesDetails(symbolRef) {
         nextFundingTime = data.T;
         startCountdown();
       }
+      store.setRealTimePrice(perpPrice.value);
     };
   };
 
@@ -112,6 +113,7 @@ export function useFuturesDetails(symbolRef) {
     _symbol.value = newSymbol.toUpperCase();
 
     // Reset store for new symbol
+
     store.setPrice(null);
 
     await fetchSnapshot();

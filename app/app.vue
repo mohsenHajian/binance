@@ -11,13 +11,7 @@
         />
         <LandingDetails :style="{ width: xlWidth + 'px' }" />
         <TradingViewBox :style="{ width: lgWidth + 'px' }" />
-
-        <div
-          class="flex items-center justify-center box h-[220px] drag-handle"
-          :style="{ width: smWidth + 'px' }"
-        >
-          hi
-        </div>
+        <OrderBook :style="{ width: smWidth + 'px' }" />
         <TradeHistory :style="{ width: xlWidth + 'px' }" />
       </div>
 
@@ -41,6 +35,7 @@ import TradingBox from "./components/Sidebar/TradingBox.vue";
 import TradingViewBox from "./components/Main/TradingViewBox.vue";
 import AccountBox from "./components/Sidebar/AccountBox.vue";
 import TradeHistory from "./components/Main/TradeHistory.vue";
+import OrderBook from "./components/Main/OrderBook.vue";
 
 const route = useRoute();
 const router = useRouter();

@@ -265,7 +265,6 @@ const onDrag = (e) => {
 watch(
   () => futuresStore.getPrice(),
   (newVal) => {
-    console.log("newVal", newVal);
     if (newVal) price.value = newVal;
   }
 );

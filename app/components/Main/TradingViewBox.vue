@@ -1,6 +1,6 @@
 <template>
-  <div class="relative drag-handle">
-    <div class="absolute top-1 right-2 z-50 cursor-pointer">
+  <div class="relative drag-handle max-h-[600px]">
+    <div class="absolute top-2 right-2 z-50 cursor-pointer">
       <button
         @click="toggleFullscreen"
         class="px-3 py-1 bg-[#0F0F0F] text-white rounded"
@@ -15,48 +15,50 @@
 
     <div
       id="tv-chart"
-      class="relative z-30 !h-[40vh] w-full overflow-hidden rounded-lg"
+      class="relative z-30 w-full h-full overflow-hidden rounded-lg"
     ></div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, watch } from "vue";
+import { onMounted, watch, ref } from "vue";
 import { useRoute } from "#imports";
 
 const route = useRoute();
-let tvWidget = null;
+const tvWidget = ref(null);
+
+const initTradingView = (symbol) => {
+  const container = document.getElementById("tv-chart");
+  container.innerHTML = "";
+  tvWidget.value = new window.TradingView.widget({
+    container_id: "tv-chart",
+    autosize: true,
+    symbol: symbol || "BINANCE:BTCUSDT",
+    interval: "60",
+    theme: "dark",
+    style: "1",
+    timezone: "Etc/UTC",
+    locale: "en",
+    disabled_features: [
+      "symbol_search",
+      "header_symbol_search",
+      "symbol_info",
+      "header_compare",
+      "header_screenshot",
+      "header_saveload",
+      "widgetbar",
+    ],
+    hide_side_toolbar: false,
+    backgroundColor: "#181a20",
+  });
+};
 
 onMounted(() => {
   const script = document.createElement("script");
   script.src = "https://s3.tradingview.com/tv.js";
-
   script.onload = () => {
-    tvWidget = new window.TradingView.widget({
-      container_id: "tv-chart",
-      autosize: true,
-      symbol: route.query.symbol || "BINANCE:BTCUSDT",
-      interval: "60",
-      theme: "dark",
-
-      disabled_features: [
-        "symbol_search",
-        "header_symbol_search",
-        "symbol_info",
-        "header_compare",
-        "header_screenshot",
-        "header_saveload",
-        "widgetbar",
-      ],
-      hide_side_toolbar: false,
-
-      backgroundColor: "#181a20",
-      locale: "en",
-      style: "1",
-      timezone: "Etc/UTC",
-    });
+    initTradingView(route.query.symbol);
   };
-
   document.body.appendChild(script);
 });
 
@@ -64,34 +66,24 @@ watch(
   () => route.query.symbol,
   (symbol) => {
     if (!symbol) return;
-
-    const container = document.getElementById("tv-chart");
-    container.innerHTML = "";
-
-    tvWidget = new window.TradingView.widget({
-      container_id: "tv-chart",
-      autosize: true,
-      symbol: symbol,
-      interval: "60",
-      theme: "dark",
-
-      disabled_features: [
-        "symbol_search",
-        "header_symbol_search",
-        "symbol_info",
-        "header_compare",
-        "header_screenshot",
-        "header_saveload",
-        "widgetbar",
-      ],
-
-      backgroundColor: "#181a20",
-      locale: "en",
-      style: "1",
-      timezone: "Etc/UTC",
-    });
+    if (window.TradingView) {
+      initTradingView(symbol);
+    }
   }
 );
+
+const toggleFullscreen = () => {
+  const elem = document.getElementById("tv-chart");
+  if (!document.fullscreenElement) {
+    elem.requestFullscreen().catch((err) => {
+      console.warn(
+        `Error attempting to enable full-screen mode: ${err.message}`
+      );
+    });
+  } else {
+    document.exitFullscreen();
+  }
+};
 </script>
 
 <style scoped>
@@ -101,5 +93,7 @@ watch(
   border: none !important;
   box-shadow: none !important;
   outline: none !important;
+  height: 100% !important;
+  width: 100% !important;
 }
 </style>
